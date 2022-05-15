@@ -19,25 +19,19 @@ class DoubleLinkedList:
             current_node = current_node.next
         return counter
 
-    def insert_in_list(self, data, rand=None):
-        if self.head is None:
-            new_node = ListNode(data, rand)
-            self.head = new_node
-            self.tail = new_node
-        else:
-            new_node = ListNode(data, rand)
-            self.tail.next = new_node
-            self.tail = new_node
-
     def serializer(self):
+        #Разделитель между ListNode.data и ListNode.rand
         split_rand = ','
+        #Разделитель между узлами
         split_node = '\n'
         with open('test.json', 'w') as fl:
             current_node = self.head
             while current_node is not None:
                 fl.write(str(current_node.data))
                 if current_node.rand is not None:
+                    #Установка разделителей
                     fl.write(split_rand)
+                    #Запись информации в файл
                     fl.write(str(current_node.rand))
                     fl.write(split_node)
                 else:
@@ -46,6 +40,7 @@ class DoubleLinkedList:
                 current_node = current_node.next
 
     def deserializer(self):
+        #Буфер для временного хранения ListNode.data и ListNode.rand
         buf = []
         file_eof = ''
         lst = DoubleLinkedList()
@@ -57,10 +52,28 @@ class DoubleLinkedList:
                 else:
                     buf = file.split(',')
                     buf[1].split('\n')
+                    #Обработка исключения, если вторая ячейка массива пустая
+                    #В этом случае ListNode.rand = None
                     try:
                         buf[1]
                     except IndexError:
-                        lst.insert_in_list(buf[0], None)
+                        #Добавление считанного элемента в список
+                        if self.head is None:
+                            new_node = ListNode(buf[0])
+                            self.head = new_node
+                            self.tail = new_node
+                        else:
+                            new_node = ListNode(buf[0])
+                            self.tail.next = new_node
+                            self.tail = new_node
+                        #Продолжение считывания
                         continue
-                    lst.insert_in_list(buf[0], buf[1])
+                    if self.head is None:
+                        new_node = ListNode(buf[0], buf[1])
+                        self.head = new_node
+                        self.tail = new_node
+                    else:
+                        new_node = ListNode(buf[0], buf[1])
+                        self.tail.next = new_node
+                        self.tail = new_node
         return lst
